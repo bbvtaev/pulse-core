@@ -219,7 +219,7 @@ func BenchmarkWriteThroughput(b *testing.B) {
 			})
 		}
 
-		err := db.Write("load", map[string]string{"sensor": "A1"}, points)
+		err := db.Write("load", map[string]string{"sensor": "A1"}, 123.00)
 		if err != nil {
 			b.Fatalf("Write error: %v", err)
 		}
@@ -239,18 +239,17 @@ func BenchmarkWriteThroughput(b *testing.B) {
 }
 
 func BenchmarkWrite_BottleneckAnalysis(b *testing.B) {
-	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
-	payload := make([]tsdb.Point, 10)
-	for i := range payload {
-		payload[i] = tsdb.Point{Timestamp: time.Now().Unix(), Value: rnd.Float64()}
+	db, err := tsdb.Open()
+	if err != nil {
+		b.Fatalf("Open error: %v", err)
 	}
 
 	b.Run("Sustained_Write_KeepOpen", func(b *testing.B) {
-		db := newBenchDB(b)
+		_ = newBenchDB(b)
 
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			if err := db.Write("bench_metric", map[string]string{"h": "1"}, payload); err != nil {
+			if err := db.Write("bench_metric", map[string]string{"h": "1"}, 52); err != nil {
 				b.Fatal(err)
 			}
 		}
@@ -267,7 +266,7 @@ func BenchmarkWrite_BottleneckAnalysis(b *testing.B) {
 				b.Fatalf("Open error: %v", err)
 			}
 
-			if err := db.Write("bench_metric", map[string]string{"h": "1"}, payload); err != nil {
+			if err := db.Write("bench_metric", map[string]string{"h": "1"}, 52); err != nil {
 				b.Fatal(err)
 			}
 
@@ -286,7 +285,7 @@ func TestWriteDegradation(t *testing.T) {
 	db := newTestDB(t)
 
 	const batchSize = 100
-	const initialBatches = 1000000
+	const initialBatches = 10000000
 	const measureBatches = 100
 
 	startEmpty := time.Now()
@@ -296,9 +295,8 @@ func TestWriteDegradation(t *testing.T) {
 	durationEmpty := time.Since(startEmpty)
 
 	t.Log("Generating load...")
-	payload := make([]tsdb.Point, batchSize)
 	for i := 0; i < initialBatches; i++ {
-		_ = db.Write("metric_load", map[string]string{"k": "v"}, payload)
+		_ = db.Write("metric_load", map[string]string{"k": "v"}, 52)
 	}
 
 	t.Log("Waiting for WAL to drain...")
