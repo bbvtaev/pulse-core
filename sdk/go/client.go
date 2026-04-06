@@ -2,7 +2,7 @@
 //
 // Пример использования:
 //
-//	client, err := solenix.NewClient("localhost:50051")
+//	client, err := solenix.NewClient("127.0.0.1:8731")
 //	if err != nil { log.Fatal(err) }
 //	defer client.Close()
 //
@@ -47,7 +47,7 @@ type Client struct {
 	timeout time.Duration
 }
 
-// NewClient подключается к серверу solenix-core по адресу addr (например "localhost:8731").
+// NewClient подключается к серверу solenix-core по адресу addr (например "127.0.0.1:8731").
 func NewClient(addr string) (*Client, error) {
 	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
