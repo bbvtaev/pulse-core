@@ -76,7 +76,7 @@ func (h *HTTPServer) handleQuery(w http.ResponseWriter, r *http.Request) {
 		labels[k] = v
 	}
 
-	results, err := h.db.Query(metric, labels, from, to)
+	results, err := h.db.Query(metric, labels, from, to, nil)
 	if err != nil {
 		http.Error(w, fmt.Sprintf(`{"error":%q}`, err.Error()), http.StatusBadRequest)
 		return
@@ -99,7 +99,7 @@ func (h *HTTPServer) handleLatest(w http.ResponseWriter, r *http.Request) {
 
 	rows := make([]row, 0)
 	for _, name := range names {
-		series, err := h.db.Query(name, nil, 0, 0)
+		series, err := h.db.Query(name, nil, 0, 0, nil)
 		if err != nil {
 			continue
 		}

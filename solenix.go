@@ -15,8 +15,7 @@ type (
 	WriteSeries     = model.WriteSeries
 	SeriesResult    = model.SeriesResult
 	AggType         = model.AggType
-	AggPoint        = model.AggPoint
-	AggResult       = model.AggResult
+	QueryOptions    = model.QueryOptions
 	Config          = config.Config
 	CollectorConfig = model.CollectorConfig
 )
